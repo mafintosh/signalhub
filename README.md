@@ -12,6 +12,8 @@ Or to install the command line tool
 npm install -g signalhub
 ```
 
+[![build status](http://img.shields.io/travis/mafintosh/signalhub.svg?style=flat)](http://travis-ci.org/mafintosh/signalhub)
+
 ## Usage
 
 ``` js
