@@ -12,7 +12,7 @@ module.exports = function () {
 
   var get = function (channel) {
     if (channels[channel]) return channels[channel]
-    channels[channel] = {name: channel, messages: [], subscribers: []}
+    channels[channel] = {name: channel, subscribers: []}
     return channels[channel]
   }
 
@@ -32,7 +32,6 @@ module.exports = function () {
         server.emit('publish', channel.name, data)
         data = Buffer.concat(data).toString()
 
-        channel.messages.push([Date.now() + TTL, data])
         for (var i = 0; i < channel.subscribers.length; i++) {
           channel.subscribers[i].write('data: ' + data + '\n\n')
         }
@@ -44,12 +43,9 @@ module.exports = function () {
     if (req.method === 'GET') {
       server.emit('subscribe', channel.name)
       channel.subscribers.push(res)
-      for (var i = channel.messages.length - 1; i >= 0; i--) {
-        res.write('data: ' + channel.messages[i][1] + '\n\n')
-      }
       eos(res, function () {
         channel.subscribers.splice(channel.subscribers.indexOf(res), 1)
-        if (!channel.subscribers.length && !channel.messages.length) delete channels[channel.name]
+        if (!channel.subscribers.length) delete channels[channel.name]
       })
       return
     }
@@ -57,24 +53,6 @@ module.exports = function () {
     res.statusCode = 404
     res.end()
   }))
-
-  var interval
-
-  server.on('listening', function () {
-    interval = setInterval(function () {
-      var names = Object.keys(channels)
-      var now = Date.now()
-      for (var i = 0; i < names.length; i++) {
-        var ch = channels[names[i]]
-        while (ch.messages.length && ch.messages[0][0] < now) ch.messages.shift()
-        if (!ch.subscribers.length && !ch.messages.length) delete channels[ch.name]
-      }
-    }, 10000)
-  })
-
-  server.on('close', function () {
-    if (interval) clearInterval(interval)
-  })
 
   return server
 }
