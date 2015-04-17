@@ -44,7 +44,7 @@ module.exports = function () {
     if (req.method === 'GET') {
       server.emit('subscribe', channel.name)
       channel.subscribers.push(res)
-      for (var i = 0; i < channel.messages.length; i++) {
+      for (var i = channel.messages.length - 1; i >= 0; i--) {
         res.write('data: ' + channel.messages[i][1] + '\n\n')
       }
       eos(res, function () {
