@@ -23,11 +23,13 @@ module.exports = function () {
       return
     }
 
-    var channel = get(req.url.slice(4).split('?')[0])
+    var name = req.url.slice(4).split('?')[0]
 
     if (req.method === 'POST') {
       collect(pump(req, limiter(64 * 1024)), function (err, data) {
-        if (err) return
+        if (err) return res.end()
+        if (!channels[name]) return res.end()
+        var channel = get(name)
 
         server.emit('publish', channel.name, data)
         data = Buffer.concat(data).toString()
@@ -41,11 +43,13 @@ module.exports = function () {
     }
 
     if (req.method === 'GET') {
+      var channel = get(name)
       server.emit('subscribe', channel.name)
       channel.subscribers.push(res)
       eos(res, function () {
-        channel.subscribers.splice(channel.subscribers.indexOf(res), 1)
-        if (!channel.subscribers.length) delete channels[channel.name]
+        var i = channel.subscribers.indexOf(res)
+        if (i > -1) channel.subscribers.splice(i, 1)
+        if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
       })
       return
     }
