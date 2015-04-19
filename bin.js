@@ -7,7 +7,7 @@ var argv = minimist(process.argv.slice(2), {
     host: 'h'
   },
   default: {
-    port: 80
+    port: process.env.PORT || 80
   }
 })
 
