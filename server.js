@@ -5,8 +5,6 @@ var pump = require('pump')
 var limiter = require('size-limit-stream')
 var eos = require('end-of-stream')
 
-var TTL = 30 * 1000
-
 module.exports = function () {
   var channels = {}
 
@@ -17,6 +15,11 @@ module.exports = function () {
   }
 
   var server = http.createServer(cors(function (req, res) {
+    if (req.url === '/') {
+      res.end(JSON.stringify({name: 'signalhub', version: require('./package').version}, null, 2) + '\n')
+      return
+    }
+
     if (req.url.slice(0, 4) !== '/v1/') {
       res.statusCode = 404
       res.end()
