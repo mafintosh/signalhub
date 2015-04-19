@@ -1,6 +1,6 @@
 {
   "name": "signalhub",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Simple signalling server that can be used to coordinate handshaking with webrtc or other fun stuff.",
   "main": "index.js",
   "dependencies": {
