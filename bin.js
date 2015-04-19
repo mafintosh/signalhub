@@ -24,7 +24,9 @@ if (cmd === 'listen') {
     console.log('broadcast: %s (%d)', channel, message.length)
   })
 
-  server.listen(argv.port)
+  server.listen(argv.port, function () {
+    console.log('signalhub listening on port %d', server.address().port)
+  })
   return
 }
 
