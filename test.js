@@ -4,7 +4,7 @@ var tape = require('tape')
 
 server.listen(9000, function () {
   tape('subscribe', function (t) {
-    var c = client('localhost:9000')
+    var c = client('localhost:9000', 'app')
 
     c.subscribe('hello').on('data', function (message) {
       t.same(message, {hello: 'world'})
