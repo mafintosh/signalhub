@@ -43,6 +43,7 @@ module.exports = function () {
     }
 
     if (req.method === 'GET') {
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
       var channel = get(name)
       server.emit('subscribe', channel.name)
       channel.subscribers.push(res)
