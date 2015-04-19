@@ -29,19 +29,19 @@ if (cmd === 'listen') {
 }
 
 if (cmd === 'subscribe') {
-  if (argv.length < 2) return console.error('Usage: lobby subscribe [channel]')
-  var client = require('./')((argv.host || 'localhost') + ':' + argv.port)
-  client.subscribe(argv._[1]).on('data', function (data) {
+  if (argv.length < 3) return console.error('Usage: signalhub subscribe [app] [channel]')
+  var client = require('./')((argv.host || 'localhost') + ':' + argv.port, argv._[1])
+  client.subscribe(argv._[2]).on('data', function (data) {
     console.log(data)
   })
   return
 }
 
 if (cmd === 'broadcast') {
-  if (argv.length < 3) return console.error('Usage: lobby broadcast [channel] [json-message]')
-  var client = require('./')((argv.host || 'localhost') + ':' + argv.port)
-  client.broadcast(argv._[1], JSON.parse(argv._[2]))
+  if (argv.length < 4) return console.error('Usage: signalhub broadcast [app] [channel] [json-message]')
+  var client = require('./')((argv.host || 'localhost') + ':' + argv.port, argv._[1])
+  client.broadcast(argv._[2], JSON.parse(argv._[3]))
   return
 }
 
-console.error('Usage: lobby listen|subscribe|broadcast')
+console.error('Usage: signalhub listen|subscribe|broadcast')

@@ -3,13 +3,15 @@ var nets = require('nets')
 
 var noop = function () {}
 
-module.exports = function (lobby) {
+module.exports = function (url, app) {
+  if (!url) throw new Error('signalhub url required')
+  if (!app) throw new Error('app name required as 2nd argument')
   var that = {}
 
-  if (lobby.indexOf('://') === -1) lobby = 'http://' + lobby
+  if (url.indexOf('://') === -1) url = 'http://' + url
 
   that.subscribe = function (channel) {
-    return ess(lobby + '/v1/' + channel, {json: true})
+    return ess(url + '/v1/' + app + '/' + channel, {json: true})
   }
 
   that.broadcast = function (channel, message, cb) {
@@ -17,7 +19,7 @@ module.exports = function (lobby) {
     nets({
       method: 'POST',
       json: message,
-      url: lobby + '/v1/' + channel
+      url: url + '/v1/' + app + '/' + channel
     }, function (err, res) {
       if (err) return cb(err)
       if (res.statusCode !== 200) return cb(new Error('Bad status: ' + res.statusCode))

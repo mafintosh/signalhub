@@ -18,7 +18,7 @@ npm install -g signalhub
 
 ``` js
 var signalhub = require('signalhub')
-var hub = signalhub('http://yourhub.com')
+var hub = signalhub('http://yourhub.com', 'my-app')
 
 hub.subscribe('/my-channel')
   .on('data', function (message) {
@@ -30,7 +30,7 @@ hub.broadcast('/my-channel', {hello: 'world'})
 
 ## API
 
-#### `hub = signalhub(url)`
+#### `hub = signalhub(url, appName)`
 
 Create a new hub client
 
@@ -53,8 +53,8 @@ signalhub listen -p 8080 # starts a signalhub server on 8080
 Or broadcast/subscribe to channels
 
 ```
-signalhub broadcast my-channel '{"hello":"world"}' -p 8080 -h yourhub.com
-signalhub subscribe my-channel -p 8080 -h yourhub.com
+signalhub broadcast my-app my-channel '{"hello":"world"}' -p 8080 -h yourhub.com
+signalhub subscribe my-app my-channel -p 8080 -h yourhub.com
 ```
 
 ## Browserify
