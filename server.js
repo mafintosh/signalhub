@@ -55,6 +55,7 @@ module.exports = function () {
         if (i > -1) channel.subscribers.splice(i, 1)
         if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
       })
+      if (res.flushHeaders) res.flushHeaders()
       return
     }
 
