@@ -4,7 +4,8 @@ var minimist = require('minimist')
 var argv = minimist(process.argv.slice(2), {
   alias: {
     port: 'p',
-    host: 'h'
+    host: 'h',
+    'max-broadcasts': 'm'
   },
   default: {
     port: process.env.PORT || 80
@@ -14,7 +15,8 @@ var argv = minimist(process.argv.slice(2), {
 var cmd = argv._[0]
 
 if (cmd === 'listen') {
-  var server = require('./server')()
+  var max = Number(argv['max-broadcasts']) || 0
+  var server = require('./server')({maxBroadcasts: max})
 
   server.on('subscribe', function (channel) {
     console.log('subscribe: %s', channel)

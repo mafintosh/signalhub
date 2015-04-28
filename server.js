@@ -2,11 +2,13 @@ var http = require('http')
 var cors = require('corsify')
 var collect = require('stream-collector')
 var pump = require('pump')
+var iterate = require('random-iterate')
 var limiter = require('size-limit-stream')
 var eos = require('end-of-stream')
 
-module.exports = function () {
+module.exports = function (opts) {
   var channels = {}
+  var maxBroadcasts = (opts && opts.maxBroadcasts) || Infinity
 
   var get = function (channel) {
     if (channels[channel]) return channels[channel]
@@ -37,9 +39,14 @@ module.exports = function () {
         server.emit('publish', channel.name, data)
         data = Buffer.concat(data).toString()
 
-        for (var i = 0; i < channel.subscribers.length; i++) {
-          channel.subscribers[i].write('data: ' + data + '\n\n')
+        var ite = iterate(channel.subscribers)
+        var next
+        var cnt = 0
+
+        while ((next = ite()) && cnt++ < maxBroadcasts) {
+          next.write('data: ' + data + '\n\n')
         }
+
         res.end()
       })
       return
