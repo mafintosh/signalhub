@@ -11,7 +11,15 @@ module.exports = function (url, app) {
   if (url.indexOf('://') === -1) url = 'http://' + url
 
   that.subscribe = function (channel) {
-    return ess(url + '/v1/' + app + '/' + channel, {json: true})
+    var endpoint = url + '/v1/' + app + '/'
+
+    if (channel instanceof Array) {
+      endpoint += channel.join(',')
+    } else {
+      endpoint += channel
+    }
+
+    return ess(endpoint, {json: true})
   }
 
   that.broadcast = function (channel, message, cb) {
