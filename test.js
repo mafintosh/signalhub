@@ -30,7 +30,7 @@ server.listen(9000, function () {
     })
 
     c.broadcast('hello', { msg: msgs[0]})
-    c.broadcast('hello', { msg: msgs[1]})
+    c.broadcast('goodbye', { msg: msgs[1]})
   })
 
   tape('end', function (t) {

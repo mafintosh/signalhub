@@ -55,8 +55,11 @@ module.exports = function (opts) {
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
 
-      name.split(',').forEach(function (name) {
-        var channel = get(name)
+      var app = name.split('/')[0]
+      var channelNames = name.split('/')[1]
+
+      channelNames.split(',').forEach(function (channelName) {
+        var channel = get(app + '/' + channelName)
         server.emit('subscribe', channel.name)
         channel.subscribers.push(res)
         eos(res, function () {
