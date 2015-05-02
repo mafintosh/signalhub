@@ -18,7 +18,9 @@ npm install -g signalhub
 
 ``` js
 var signalhub = require('signalhub')
-var hub = signalhub('http://yourhub.com', 'my-app')
+var hub = signalhub('my-app-name', [
+  'http://yourhub.com'
+])
 
 hub.subscribe('/my-channel')
   .on('data', function (message) {
@@ -30,9 +32,21 @@ hub.broadcast('/my-channel', {hello: 'world'})
 
 ## API
 
-#### `hub = signalhub(url, appName)`
+#### `hub = signalhub(appName, urls)`
 
-Create a new hub client
+Create a new hub client. If you have more than one hub running specify them in an array
+
+``` js
+// use more than one server for redundancy
+var hub = signalhub('my-app-name', [
+  'https://signalhub1.example.com',
+  'https://signalhub2.example.com',
+  'https://signalhub3.example.com'
+])
+```
+
+The `appName` is used to namespace the subscriptions/broadcast so you can reuse the
+signalhub for than one app.
 
 #### `stream = hub.subscribe(channel)`
 
