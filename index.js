@@ -26,6 +26,7 @@ module.exports = function (app, urls) {
 
     var all = through.obj()
 
+    all.setMaxListeners(0)
     streams.forEach(function (stream) {
       pump(stream, all)
     })
