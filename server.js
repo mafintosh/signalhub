@@ -56,7 +56,7 @@ module.exports = function (opts) {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
 
       var app = name.split('/')[0]
-      var channelNames = name.split('/')[1]
+      var channelNames = name.slice(app.length + 1)
 
       channelNames.split(',').forEach(function (channelName) {
         var channel = get(app + '/' + channelName)
