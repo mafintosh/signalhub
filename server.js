@@ -1,5 +1,5 @@
 var http = require('http')
-var cors = require('corsify')
+var corsify = require('corsify')
 var collect = require('stream-collector')
 var pump = require('pump')
 var iterate = require('random-iterate')
@@ -15,6 +15,12 @@ module.exports = function (opts) {
     channels[channel] = {name: channel, subscribers: []}
     return channels[channel]
   }
+  
+  var cors = corsify({
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+    "Access-Control-Allow-Headers": "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization"
+  })
 
   var server = http.createServer(cors(function (req, res) {
     if (req.url === '/') {
