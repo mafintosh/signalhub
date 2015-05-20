@@ -1,10 +1,14 @@
 var http = require('http')
-var cors = require('corsify')
+var Corsify = require('corsify')
 var collect = require('stream-collector')
 var pump = require('pump')
 var iterate = require('random-iterate')
 var limiter = require('size-limit-stream')
 var eos = require('end-of-stream')
+
+var cors = Corsify({
+  'Access-Control-Allow-Origin': '*'
+});
 
 module.exports = function (opts) {
   var channels = {}
