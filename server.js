@@ -60,15 +60,23 @@ module.exports = function (opts) {
 
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
-      var channel = get(name)
-      server.emit('subscribe', channel.name)
-      channel.subscribers.push(res)
-      eos(res, function () {
-        var i = channel.subscribers.indexOf(res)
-        if (i > -1) channel.subscribers.splice(i, 1)
-        if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
+
+      var app = name.split('/')[0]
+      var channelNames = name.slice(app.length + 1)
+
+      channelNames.split(',').forEach(function (channelName) {
+        var channel = get(app + '/' + channelName)
+        server.emit('subscribe', channel.name)
+        channel.subscribers.push(res)
+        eos(res, function () {
+          var i = channel.subscribers.indexOf(res)
+          if (i > -1) channel.subscribers.splice(i, 1)
+          if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
+        })
       })
+
       if (res.flushHeaders) res.flushHeaders()
+
       return
     }
 

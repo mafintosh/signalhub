@@ -17,9 +17,17 @@ module.exports = function (app, urls) {
   })
 
   that.subscribe = function (channel) {
+    var endpoint
+
+    if (Array.isArray(channel)) {
+      endpoint = channel.join(',')
+    } else {
+      endpoint = channel
+    }
+
     var all = through.obj()
     var streams = urls.map(function (url) {
-      return ess(url + '/v1/' + app + '/' + channel, {json: true})
+      return ess(url + '/v1/' + app + '/' + endpoint, {json: true})
     })
 
     if (streams.length === 1) return streams[0]

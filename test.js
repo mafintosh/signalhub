@@ -15,6 +15,34 @@ server.listen(9000, function () {
     c.broadcast('hello', {hello: 'world'})
   })
 
+  tape('subscribe to many', function (t) {
+    var c = client('app', ['localhost:9000'])
+    var msgs = ['stranger', 'friend']
+
+    c.subscribe(['hello', 'goodbye']).on('data', function (message) {
+      t.same(message, {msg: msgs.shift()})
+      if (msgs.length === 0) {
+        t.end()
+        this.destroy()
+      }
+    })
+
+    c.broadcast('hello', { msg: msgs[0]})
+    c.broadcast('goodbye', { msg: msgs[1]})
+  })
+
+  tape('subscribe to channels with slash in the name', function (t) {
+    var c = client('app', ['localhost:9000'])
+
+    c.subscribe('hello/people').on('data', function (message) {
+      t.same(message, [1, 2, 3])
+      t.end()
+      this.destroy()
+    })
+
+    c.broadcast('hello/people', [1, 2, 3])
+  })
+
   tape('end', function (t) {
     server.close()
     t.ok(true)
