@@ -1,29 +1,48 @@
 var ess = require('event-source-stream')
 var nets = require('nets')
+var pump = require('pump')
+var through = require('through2')
 
 var noop = function () {}
 
-module.exports = function (url, app) {
-  if (!url) throw new Error('signalhub url required')
-  if (!app) throw new Error('app name required as 2nd argument')
-  var that = {}
+module.exports = function (app, urls) {
+  if (!app) throw new Error('app name required')
+  if (!urls || !urls.length) throw new Error('signalhub url(s) required')
 
-  if (url.indexOf('://') === -1) url = 'http://' + url
+  var that = {}
+  if (!Array.isArray(urls)) urls = [urls]
+
+  urls = urls.map(function (url) {
+    return url.indexOf('://') === -1 ? 'http://' + url : url
+  })
 
   that.subscribe = function (channel) {
-    var endpoint = url + '/v1/' + app + '/'
+    var endpoint
 
-    if (channel instanceof Array) {
-      endpoint += channel.join(',')
+    if (Array.isArray(channel)) {
+      endpoint = channel.join(',')
     } else {
-      endpoint += channel
+      endpoint = channel
     }
 
-    return ess(endpoint, {json: true})
+    var all = through.obj()
+    var streams = urls.map(function (url) {
+      return ess(url + '/v1/' + app + '/' + endpoint, {json: true})
+    })
+
+    if (streams.length === 1) return streams[0]
+
+    var all = through.obj()
+
+    all.setMaxListeners(0)
+    streams.forEach(function (stream) {
+      pump(stream, all)
+    })
+
+    return all
   }
 
-  that.broadcast = function (channel, message, cb) {
-    if (!cb) cb = noop
+  var broadcast = function (url, channel, message, cb) {
     nets({
       method: 'POST',
       json: message,
@@ -32,6 +51,22 @@ module.exports = function (url, app) {
       if (err) return cb(err)
       if (res.statusCode !== 200) return cb(new Error('Bad status: ' + res.statusCode))
       cb()
+    })
+  }
+
+  that.broadcast = function (channel, message, cb) {
+    if (!cb) cb = noop
+
+    var pending = urls.length
+    var errors = 0
+
+    urls.forEach(function (url) {
+      broadcast(url, channel, message, function (err) {
+        if (err) errors++
+        if (--pending) return
+        if (errors === urls.length) return cb(err)
+        cb()
+      })
     })
   }
 

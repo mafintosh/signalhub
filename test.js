@@ -4,7 +4,7 @@ var tape = require('tape')
 
 server.listen(9000, function () {
   tape('subscribe', function (t) {
-    var c = client('localhost:9000', 'app')
+    var c = client('app', ['localhost:9000'])
 
     c.subscribe('hello').on('data', function (message) {
       t.same(message, {hello: 'world'})
@@ -16,7 +16,7 @@ server.listen(9000, function () {
   })
 
   tape('subscribe to many', function (t) {
-    var c = client('localhost:9000', 'app')
+    var c = client('app', ['localhost:9000'])
     var msgs = ['stranger', 'friend']
 
     c.subscribe(['hello', 'goodbye']).on('data', function (message) {
@@ -32,7 +32,7 @@ server.listen(9000, function () {
   })
 
   tape('subscribe to channels with slash in the name', function (t) {
-    var c = client('localhost:9000', 'app')
+    var c = client('app', ['localhost:9000'])
 
     c.subscribe('hello/people').on('data', function (message) {
       t.same(message, [1, 2, 3])

@@ -1,18 +1,19 @@
 {
   "name": "signalhub",
-  "version": "3.4.0",
+  "version": "4.0.3",
   "description": "Simple signalling server that can be used to coordinate handshaking with webrtc or other fun stuff.",
   "main": "index.js",
   "dependencies": {
     "corsify": "^2.1.0",
     "end-of-stream": "^1.1.0",
-    "event-source-stream": "^1.3.0",
+    "event-source-stream": "^1.3.1",
     "minimist": "^1.1.1",
     "nets": "^3.1.0",
     "pump": "^1.0.0",
     "random-iterate": "^1.0.1",
     "size-limit-stream": "^1.0.0",
-    "stream-collector": "^1.0.1"
+    "stream-collector": "^1.0.1",
+    "through2": "^0.6.5"
   },
   "devDependencies": {
     "tape": "^4.0.0"
