@@ -46,7 +46,7 @@ var hub = signalhub('my-app-name', [
 ```
 
 The `appName` is used to namespace the subscriptions/broadcast so you can reuse the
-signalhub for than one app.
+signalhub for more than one app.
 
 #### `stream = hub.subscribe(channel)`
 
