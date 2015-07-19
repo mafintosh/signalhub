@@ -36,6 +36,9 @@ module.exports = function (app, urls) {
 
     all.setMaxListeners(0)
     streams.forEach(function (stream) {
+      stream.on('open', function () {
+        all.emit('open')
+      })
       pump(stream, all)
     })
 

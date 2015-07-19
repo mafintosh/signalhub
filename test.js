@@ -43,6 +43,18 @@ server.listen(9000, function () {
     c.broadcast('hello/people', [1, 2, 3])
   })
 
+  tape('open emitted with multiple hubs', function (t) {
+    var c = client('app', [
+      'localhost:9000',
+      'localhost:9000'
+    ])
+    c.subscribe('hello').on('open', function () {
+      t.ok(true, 'got an open event')
+      this.destroy()
+      t.end()
+    })
+  })
+
   tape('end', function (t) {
     server.close()
     t.ok(true)
