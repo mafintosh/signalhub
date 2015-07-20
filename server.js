@@ -6,6 +6,15 @@ var iterate = require('random-iterate')
 var limiter = require('size-limit-stream')
 var eos = require('end-of-stream')
 
+var flushHeaders = function (res) {
+  if (res.flushHeaders) {
+    res.flushHeaders()
+  } else {
+    if (!res._header) res._implicitHeader()
+    res._send('')
+  }
+}
+
 module.exports = function (opts) {
   var channels = {}
   var maxBroadcasts = (opts && opts.maxBroadcasts) || Infinity
@@ -15,7 +24,7 @@ module.exports = function (opts) {
     channels[channel] = {name: channel, subscribers: []}
     return channels[channel]
   }
-  
+
   var cors = corsify({
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
@@ -75,8 +84,7 @@ module.exports = function (opts) {
         })
       })
 
-      if (res.flushHeaders) res.flushHeaders()
-
+      flushHeaders(res)
       return
     }
 
