@@ -64,6 +64,10 @@ You can use the command line api to run a hub server
 signalhub listen -p 8080 # starts a signalhub server on 8080
 ```
 
+To listen on https, use the `--key` and `--cert` flags to specify the path to the private
+key and certificate files, respectively. These will be passed through to the node `https`
+package.
+
 Or broadcast/subscribe to channels
 
 ```

@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
+var fs = require('fs')
 var minimist = require('minimist')
 var argv = minimist(process.argv.slice(2), {
   alias: {
     port: 'p',
     host: 'h',
-    'max-broadcasts': 'm'
+    'max-broadcasts': 'm',
+    key: 'k',
+    cert: 'c'
   },
   default: {
     port: process.env.PORT || 80
@@ -16,7 +19,11 @@ var cmd = argv._[0]
 
 if (cmd === 'listen') {
   var max = Number(argv['max-broadcasts']) || 0
-  var server = require('./server')({maxBroadcasts: max})
+  var server = require('./server')({
+    maxBroadcasts: max,
+    key: argv.key && fs.readFileSync(argv.key),
+    cert: argv.key && fs.readFileSync(argv.cert)
+  })
 
   server.on('subscribe', function (channel) {
     console.log('subscribe: %s', channel)

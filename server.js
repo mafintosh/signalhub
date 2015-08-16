@@ -1,4 +1,5 @@
 var http = require('http')
+var https = require('https')
 var corsify = require('corsify')
 var collect = require('stream-collector')
 var pump = require('pump')
@@ -31,7 +32,7 @@ module.exports = function (opts) {
     "Access-Control-Allow-Headers": "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization"
   })
 
-  var server = http.createServer(cors(function (req, res) {
+  var onRequest = cors(function (req, res) {
     if (req.url === '/') {
       res.end(JSON.stringify({name: 'signalhub', version: require('./package').version}, null, 2) + '\n')
       return
@@ -90,7 +91,11 @@ module.exports = function (opts) {
 
     res.statusCode = 404
     res.end()
-  }))
+  })
+
+  var useHttps = !!(opts && opts.key && opts.cert)
+  var server = (useHttps ? https : http).createServer(opts)
+  server.on('request', onRequest)
 
   return server
 }
