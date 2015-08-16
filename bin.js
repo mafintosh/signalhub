@@ -22,7 +22,8 @@ if (cmd === 'listen') {
   var server = require('./server')({
     maxBroadcasts: max,
     key: argv.key && fs.readFileSync(argv.key),
-    cert: argv.key && fs.readFileSync(argv.cert)
+    cert: argv.cert && fs.readFileSync(argv.cert),
+    host: argv.host
   })
 
   server.on('subscribe', function (channel) {
@@ -33,7 +34,7 @@ if (cmd === 'listen') {
     console.log('broadcast: %s (%d)', channel, message.length)
   })
 
-  server.listen(argv.port, function () {
+  server.listen(argv.port, argv.host, function () {
     console.log('signalhub listening on port %d', server.address().port)
   })
   return
