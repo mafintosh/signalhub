@@ -93,7 +93,8 @@ module.exports = function (opts) {
     res.end()
   })
 
-  var server = ((opts && opts.key) ? https : http).createServer(opts)
+  var useHttps = !!(opts && opts.key && opts.cert)
+  var server = useHttps ? https.createServer(opts) : http.createServer()
   server.on('request', onRequest)
 
   return server
