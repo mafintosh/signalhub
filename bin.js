@@ -8,14 +8,21 @@ var argv = minimist(process.argv.slice(2), {
     host: 'h',
     'max-broadcasts': 'm',
     key: 'k',
-    cert: 'c'
+    cert: 'c',
+    version: 'v'
   },
+  boolean: [ 'version' ],
   default: {
     port: process.env.PORT || 80
   }
 })
 
 var cmd = argv._[0]
+
+if (argv.version) {
+  console.log(require('./package.json').version)
+  return
+}
 
 if (cmd === 'listen') {
   var max = Number(argv['max-broadcasts']) || 0
