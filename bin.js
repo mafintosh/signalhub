@@ -37,7 +37,7 @@ if (cmd === 'listen') {
     console.log('subscribe: %s', channel)
   })
 
-  server.on('broadcast', function (channel, message) {
+  server.on('publish', function (channel, message) {
     console.log('broadcast: %s (%d)', channel, message.length)
   })
 
@@ -48,8 +48,8 @@ if (cmd === 'listen') {
 }
 
 if (cmd === 'subscribe') {
-  if (argv.length < 3) return console.error('Usage: signalhub subscribe [app] [channel]')
-  var client = require('./')(argv._[1], argv.host || 'localhost')
+  if (argv._.length < 3) return console.error('Usage: signalhub subscribe [app] [channel]')
+  var client = require('./')(argv._[1], argv.host + ':' + argv.port || 'localhost:8080')
   client.subscribe(argv._[2]).on('data', function (data) {
     console.log(data)
   })
@@ -57,8 +57,8 @@ if (cmd === 'subscribe') {
 }
 
 if (cmd === 'broadcast') {
-  if (argv.length < 4) return console.error('Usage: signalhub broadcast [app] [channel] [json-message]')
-  var client = require('./')(argv._[1], argv.host || 'localhost')
+  if (argv._.length < 4) return console.error('Usage: signalhub broadcast [app] [channel] [json-message]')
+  var client = require('./')(argv._[1], argv.host + ':' + argv.port || 'localhost:8080')
   client.broadcast(argv._[2], JSON.parse(argv._[3]))
   return
 }
