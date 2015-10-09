@@ -68,6 +68,8 @@ To listen on https, use the `--key` and `--cert` flags to specify the path to th
 key and certificate files, respectively. These will be passed through to the node `https`
 package.
 
+To avoid logging to console on every subscribe/broadcast event use the `--quiet` or `-q` flag.
+
 Or broadcast/subscribe to channels
 
 ```
