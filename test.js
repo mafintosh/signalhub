@@ -40,8 +40,9 @@ server.listen(9000, function () {
         this.destroy()
       }
     }).on('open', function () {
-      c.broadcast('hello', { msg: msgs[0]})
-      c.broadcast('goodbye', { msg: msgs[1]})
+      c.broadcast('hello', { msg: 'stranger'}, function () {
+        c.broadcast('goodbye', { msg: 'friend'})
+      })
     })
   })
 
