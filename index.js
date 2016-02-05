@@ -13,6 +13,7 @@ module.exports = function (app, urls) {
   if (!Array.isArray(urls)) urls = [urls]
 
   urls = urls.map(function (url) {
+    url = url.replace(/\/$/, '')
     return url.indexOf('://') === -1 ? 'http://' + url : url
   })
 

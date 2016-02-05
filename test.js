@@ -10,9 +10,23 @@ server.listen(9000, function () {
       t.same(message, {hello: 'world'})
       t.end()
       this.destroy()
+    }).on('open', function () {
+      c.broadcast('hello', {hello: 'world'})
     })
 
-    c.broadcast('hello', {hello: 'world'})
+  })
+
+  tape('subscribe with trailing /', function (t) {
+    var c = client('app', ['localhost:9000/'])
+
+    c.subscribe('hello').on('data', function (message) {
+      t.same(message, {hello: 'world'})
+      t.end()
+      this.destroy()
+    }).on('open', function () {
+      c.broadcast('hello', {hello: 'world'})
+    })
+
   })
 
   tape('subscribe to many', function (t) {
@@ -25,10 +39,10 @@ server.listen(9000, function () {
         t.end()
         this.destroy()
       }
+    }).on('open', function () {
+      c.broadcast('hello', { msg: msgs[0]})
+      c.broadcast('goodbye', { msg: msgs[1]})
     })
-
-    c.broadcast('hello', { msg: msgs[0]})
-    c.broadcast('goodbye', { msg: msgs[1]})
   })
 
   tape('subscribe to channels with slash in the name', function (t) {
@@ -38,9 +52,9 @@ server.listen(9000, function () {
       t.same(message, [1, 2, 3])
       t.end()
       this.destroy()
+    }).on('open', function () {
+      c.broadcast('hello/people', [1, 2, 3])
     })
-
-    c.broadcast('hello/people', [1, 2, 3])
   })
 
   tape('open emitted with multiple hubs', function (t) {
