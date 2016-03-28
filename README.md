@@ -80,7 +80,7 @@ signalhub subscribe my-app my-channel -p 8080 -h yourhub.com
 This also works in the browser using browserify :)
 
 ## Heroku
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## License
 
