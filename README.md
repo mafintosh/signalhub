@@ -22,12 +22,12 @@ var hub = signalhub('my-app-name', [
   'http://yourhub.com'
 ])
 
-hub.subscribe('/my-channel')
+hub.subscribe('my-channel')
   .on('data', function (message) {
     console.log('new message received', message)
   })
 
-hub.broadcast('/my-channel', {hello: 'world'})
+hub.broadcast('my-channel', {hello: 'world'})
 ```
 
 ## API
@@ -78,6 +78,9 @@ signalhub subscribe my-app my-channel -p 8080 -h yourhub.com
 ## Browserify
 
 This also works in the browser using browserify :)
+
+## Heroku
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy
 
 ## License
 
