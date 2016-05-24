@@ -76,3 +76,5 @@ module.exports = function (app, urls) {
 
   return that
 }
+
+module.exports.server = require('server')
