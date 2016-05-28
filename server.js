@@ -27,9 +27,9 @@ module.exports = function (opts) {
   }
 
   var cors = corsify({
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-    "Access-Control-Allow-Headers": "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization"
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+    'Access-Control-Allow-Headers': 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization'
   })
 
   var onRequest = cors(function (req, res) {
@@ -70,6 +70,7 @@ module.exports = function (opts) {
 
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
+      res.setTimeout(30000, ontimeout)
 
       var app = name.split('/')[0]
       var channelNames = name.slice(app.length + 1)
@@ -98,4 +99,9 @@ module.exports = function (opts) {
   server.on('request', onRequest)
 
   return server
+}
+
+function ontimeout () {
+  var flushed = this.write(':heartbeat signal\n\n')
+  if (!flushed) this.connection.destroy()
 }
