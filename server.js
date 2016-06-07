@@ -19,6 +19,7 @@ var flushHeaders = function (res) {
 module.exports = function (opts) {
   var channels = {}
   var maxBroadcasts = (opts && opts.maxBroadcasts) || Infinity
+  var subs = 0
 
   var get = function (channel) {
     if (channels[channel]) return channels[channel]
@@ -34,7 +35,7 @@ module.exports = function (opts) {
 
   var onRequest = cors(function (req, res) {
     if (req.url === '/') {
-      res.end(JSON.stringify({name: 'signalhub', version: require('./package').version}, null, 2) + '\n')
+      res.end(JSON.stringify({name: 'signalhub', version: require('./package').version, subscribers: subs}, null, 2) + '\n')
       return
     }
 
@@ -79,7 +80,9 @@ module.exports = function (opts) {
         var channel = get(app + '/' + channelName)
         server.emit('subscribe', channel.name)
         channel.subscribers.push(res)
+        subs++
         eos(res, function () {
+          subs--
           var i = channel.subscribers.indexOf(res)
           if (i > -1) channel.subscribers.splice(i, 1)
           if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
