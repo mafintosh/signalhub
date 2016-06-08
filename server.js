@@ -23,7 +23,9 @@ module.exports = function (opts) {
 
   var get = function (channel) {
     if (channels[channel]) return channels[channel]
-    channels[channel] = {name: channel, subscribers: []}
+    var sub = {name: channel, subscribers: [], heartbeat: null}
+    sub.heartbeat = setInterval(heartbeater(sub), 30 * 1000)
+    channels[channel] = sub
     return channels[channel]
   }
 
@@ -71,7 +73,6 @@ module.exports = function (opts) {
 
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
-      res.setTimeout(30000, ontimeout)
 
       var app = name.split('/')[0]
       var channelNames = name.slice(app.length + 1)
@@ -85,7 +86,10 @@ module.exports = function (opts) {
           subs--
           var i = channel.subscribers.indexOf(res)
           if (i > -1) channel.subscribers.splice(i, 1)
-          if (!channel.subscribers.length && channel === channels[channel.name]) delete channels[channel.name]
+          if (!channel.subscribers.length && channel === channels[channel.name]) {
+            clearInterval(channel.heartbeat)
+            delete channels[channel.name]
+          }
         })
       })
 
@@ -99,12 +103,22 @@ module.exports = function (opts) {
 
   var useHttps = !!(opts && opts.key && opts.cert)
   var server = useHttps ? https.createServer(opts) : http.createServer()
+
   server.on('request', onRequest)
+  server.on('close', function () {
+    var names = Object.keys(channels)
+    for (var i = 0; i < names.length; i++) {
+      clearInterval(channels[names[i]].heartbeat)
+    }
+  })
 
   return server
 }
 
-function ontimeout () {
-  var flushed = this.write(':heartbeat signal\n\n')
-  if (!flushed) this.connection.destroy()
+function heartbeater (sub) {
+  return function () {
+    for (var i = 0; i < sub.subscribers.length; i++) {
+      sub.subscribers[i].write(':heartbeat signal\n\n')
+    }
+  }
 }
