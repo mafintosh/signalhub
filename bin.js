@@ -9,9 +9,10 @@ var argv = minimist(process.argv.slice(2), {
     'max-broadcasts': 'm',
     key: 'k',
     cert: 'c',
-    version: 'v'
+    version: 'v',
+    quiet: 'q'
   },
-  boolean: [ 'version' ],
+  boolean: [ 'version', 'quiet' ],
   default: {
     port: process.env.PORT || 80
   }
@@ -33,13 +34,15 @@ if (cmd === 'listen') {
     host: argv.host
   })
 
-  server.on('subscribe', function (channel) {
-    console.log('subscribe: %s', channel)
-  })
+  if (!argv.quiet) {
+    server.on('subscribe', function (channel) {
+      console.log('subscribe: %s', channel)
+    })
 
-  server.on('publish', function (channel, message) {
-    console.log('broadcast: %s (%d)', channel, message.length)
-  })
+    server.on('publish', function (channel, message) {
+      console.log('broadcast: %s (%d)', channel, message.length)
+    })
+  }
 
   server.listen(argv.port, argv.host, function () {
     console.log('signalhub listening on port %d', server.address().port)
@@ -51,7 +54,9 @@ if (cmd === 'subscribe') {
   if (argv._.length < 3) return console.error('Usage: signalhub subscribe [app] [channel]')
   var client = require('./')(argv._[1], argv.host + ':' + argv.port || 'localhost:8080')
   client.subscribe(argv._[2]).on('data', function (data) {
-    console.log(data)
+    if (!argv.quiet) {
+      console.log(data)
+    }
   })
   return
 }
