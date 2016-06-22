@@ -56,6 +56,10 @@ Subscribe to a channel on the hub. Returns a readable stream of messages
 
 Broadcast a new message to a channel on the hub
 
+#### `hub.close([callback])`
+
+Close all subscriptions
+
 ## CLI API
 
 You can use the command line api to run a hub server
