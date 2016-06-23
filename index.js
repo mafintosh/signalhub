@@ -1,78 +1,113 @@
+var events = require('events')
 var ess = require('event-source-stream')
 var nets = require('nets')
 var pump = require('pump')
 var through = require('through2')
+var inherits = require('inherits')
 
-var noop = function () {}
+module.exports = SignalHub
 
-module.exports = function (app, urls) {
+function SignalHub (app, urls) {
+  if (!(this instanceof SignalHub)) return new SignalHub(app, urls)
+
+  events.EventEmitter.call(this)
+  this.setMaxListeners(0)
+  
   if (!app) throw new Error('app name required')
   if (!urls || !urls.length) throw new Error('signalhub url(s) required')
 
-  var that = {}
   if (!Array.isArray(urls)) urls = [urls]
 
-  urls = urls.map(function (url) {
+  this.app = app
+  this.urls = urls.map(function (url) {
     url = url.replace(/\/$/, '')
     return url.indexOf('://') === -1 ? 'http://' + url : url
   })
+  this.subscribers = []
+}
 
-  that.subscribe = function (channel) {
-    var endpoint
+inherits(SignalHub, events.EventEmitter)
 
-    if (Array.isArray(channel)) {
-      endpoint = channel.join(',')
-    } else {
-      endpoint = channel
-    }
+SignalHub.prototype.subscribe = function (channel) {
+  if (this.closed) return
 
-    var all = through.obj()
-    var streams = urls.map(function (url) {
-      return ess(url + '/v1/' + app + '/' + endpoint, {json: true})
-    })
+  var endpoint = Array.isArray(channel) ? channel.join(',') : channel
+  var streams = this.urls.map(function (url) {
+    return ess(url + '/v1/' + this.app + '/' + endpoint, {json: true})
+  })
 
-    if (streams.length === 1) return streams[0]
-
-    var all = through.obj()
-
-    all.setMaxListeners(0)
+  var subscriber
+  if (streams.length === 1) {
+    subscriber = streams[0]
+  } else {
+    subscriber = through.obj()
+    subscriber.setMaxListeners(0)
     streams.forEach(function (stream) {
       stream.on('open', function () {
-        all.emit('open')
+        subscriber.emit('open')
       })
-      pump(stream, all)
+      pump(stream, subscriber)
     })
-
-    return all
   }
 
-  var broadcast = function (url, channel, message, cb) {
-    nets({
-      method: 'POST',
-      json: message,
-      url: url + '/v1/' + app + '/' + channel
-    }, function (err, res) {
-      if (err) return cb(err)
-      if (res.statusCode !== 200) return cb(new Error('Bad status: ' + res.statusCode))
+  this.subscribers.push(subscriber)
+
+  var self = this
+  subscriber.once('close', function () {
+    var i = self.subscribers.indexOf(subscriber)
+    if (i > -1) self.subscribers.splice(i, 1)
+  })
+
+  return subscriber
+}
+
+SignalHub.prototype.broadcast = function (channel, message, cb) {
+  if (!cb) cb = noop
+
+  var pending = this.urls.length
+  var errors = 0
+
+  var self = this
+  this.urls.forEach(function (url) {
+    broadcast(url, channel, message, function (err) {
+      if (err) errors++
+      if (--pending) return
+      if (errors === self.urls.length) return cb(err)
       cb()
     })
-  }
-
-  that.broadcast = function (channel, message, cb) {
-    if (!cb) cb = noop
-
-    var pending = urls.length
-    var errors = 0
-
-    urls.forEach(function (url) {
-      broadcast(url, channel, message, function (err) {
-        if (err) errors++
-        if (--pending) return
-        if (errors === urls.length) return cb(err)
-        cb()
-      })
-    })
-  }
-
-  return that
+  })
 }
+
+SignalHub.prototype.close = function (cb) {
+  if (this.closed) return
+  this.closed = true
+
+  if (cb) this.once('close', cb)
+  var len = this.subscribers.length
+  if (len > 0) {
+    var self = this
+    var closed = 0
+    this.subscribers.forEach(function (subscriber) {
+      subscriber.once('close', function () {
+        if (++closed === len) self.emit('close')
+      })
+      subscriber.destroy()
+    })
+  } else {
+    this.emit('close')
+  }
+}
+
+function broadcast(url, channel, message, cb) {
+  return nets({
+    method: 'POST',
+    json: message,
+    url: url + '/v1/' + this.app + '/' + channel
+  }, function (err, res) {
+    if (err) return cb(err)
+    if (res.statusCode !== 200) return cb(new Error('Bad status: ' + res.statusCode))
+    cb()
+  })
+}
+
+var noop = function () {}

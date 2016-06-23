@@ -7,6 +7,7 @@
     "corsify": "^2.1.0",
     "end-of-stream": "^1.1.0",
     "event-source-stream": "^1.3.1",
+    "inherits": "^2.0.1",
     "minimist": "^1.1.1",
     "nets": "^3.1.0",
     "pump": "^1.0.0",

@@ -9,7 +9,7 @@ server.listen(9000, function () {
     c.subscribe('hello').on('data', function (message) {
       t.same(message, {hello: 'world'})
       t.end()
-      this.destroy()
+      c.close()
     }).on('open', function () {
       c.broadcast('hello', {hello: 'world'})
     })
@@ -22,7 +22,7 @@ server.listen(9000, function () {
     c.subscribe('hello').on('data', function (message) {
       t.same(message, {hello: 'world'})
       t.end()
-      this.destroy()
+      c.close()
     }).on('open', function () {
       c.broadcast('hello', {hello: 'world'})
     })
@@ -36,8 +36,10 @@ server.listen(9000, function () {
     c.subscribe(['hello', 'goodbye']).on('data', function (message) {
       t.same(message, {msg: msgs.shift()})
       if (msgs.length === 0) {
-        t.end()
-        this.destroy()
+        c.close(function () {
+          t.equal(c.subscribers.length, 0, 'all subscribers closed')
+          t.end()
+        })
       }
     }).on('open', function () {
       c.broadcast('hello', { msg: 'stranger'}, function () {
@@ -52,7 +54,7 @@ server.listen(9000, function () {
     c.subscribe('hello/people').on('data', function (message) {
       t.same(message, [1, 2, 3])
       t.end()
-      this.destroy()
+      c.close()
     }).on('open', function () {
       c.broadcast('hello/people', [1, 2, 3])
     })
@@ -65,7 +67,7 @@ server.listen(9000, function () {
     ])
     c.subscribe('hello').on('open', function () {
       t.ok(true, 'got an open event')
-      this.destroy()
+      c.close()
       t.end()
     })
   })
