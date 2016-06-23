@@ -48,6 +48,18 @@ server.listen(9000, function () {
     })
   })
 
+  tape('close multiple', function (t) {
+    var c = client('app', ['localhost:9000'])
+    var msgs = ['stranger', 'friend']
+
+    c.subscribe(['hello', 'goodbye'])
+    c.subscribe(['hi', 'bye'])
+    c.close(function () {
+      t.equal(c.subscribers.length, 0, 'all subscribers closed')
+      t.end()
+    })
+  })
+
   tape('subscribe to channels with slash in the name', function (t) {
     var c = client('app', ['localhost:9000'])
 

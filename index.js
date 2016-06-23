@@ -56,7 +56,7 @@ SignalHub.prototype.subscribe = function (channel) {
   var self = this
   subscriber.once('close', function () {
     var i = self.subscribers.indexOf(subscriber)
-    if (i > -1) self.subscribers.splice(i, 1)
+    if (i > -1) self.subscribers[i] = undefined
   })
 
   return subscriber
@@ -91,7 +91,10 @@ SignalHub.prototype.close = function (cb) {
     var closed = 0
     this.subscribers.forEach(function (subscriber) {
       subscriber.once('close', function () {
-        if (++closed === len) self.emit('close')
+        if (++closed === len) {
+          self.subscribers = self.subscribers.filter(function (n) { return n })
+          self.emit('close')
+        }
       })
       subscriber.destroy()
     })
