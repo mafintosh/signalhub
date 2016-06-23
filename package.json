@@ -17,10 +17,11 @@
     "through2": "^0.6.5"
   },
   "devDependencies": {
+    "standard": "^7.1.2",
     "tape": "^4.0.0"
   },
   "scripts": {
-    "test": "tape test.js"
+    "test": "standard && tape test.js"
   },
   "bin": {
     "signalhub": "./bin.js"

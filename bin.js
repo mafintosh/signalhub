@@ -20,12 +20,13 @@ var argv = minimist(process.argv.slice(2), {
 
 var cmd = argv._[0]
 
-if (argv.version) {
-  console.log(require('./package.json').version)
-  return
-}
+if (argv.version) console.log(require('./package.json').version)
+else if (cmd === 'listen') listen()
+else if (cmd === 'subscribe') subscribe()
+else if (cmd === 'broadcast') broadcast()
+else console.error('Usage: signalhub listen|subscribe|broadcast')
 
-if (cmd === 'listen') {
+function listen () {
   var max = Number(argv['max-broadcasts']) || 0
   var server = require('./server')({
     maxBroadcasts: max,
@@ -47,10 +48,9 @@ if (cmd === 'listen') {
   server.listen(argv.port, argv.host, function () {
     console.log('signalhub listening on port %d', server.address().port)
   })
-  return
 }
 
-if (cmd === 'subscribe') {
+function subscribe () {
   if (argv._.length < 3) return console.error('Usage: signalhub subscribe [app] [channel]')
   var client = require('./')(argv._[1], argv.host + ':' + argv.port || 'localhost:8080')
   client.subscribe(argv._[2]).on('data', function (data) {
@@ -58,14 +58,10 @@ if (cmd === 'subscribe') {
       console.log(data)
     }
   })
-  return
 }
 
-if (cmd === 'broadcast') {
+function broadcast () {
   if (argv._.length < 4) return console.error('Usage: signalhub broadcast [app] [channel] [json-message]')
   var client = require('./')(argv._[1], argv.host + ':' + argv.port || 'localhost:8080')
   client.broadcast(argv._[2], JSON.parse(argv._[3]))
-  return
 }
-
-console.error('Usage: signalhub listen|subscribe|broadcast')

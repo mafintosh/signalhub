@@ -104,7 +104,7 @@ SignalHub.prototype.close = function (cb) {
   }
 }
 
-function broadcast(url, channel, message, cb) {
+function broadcast (url, channel, message, cb) {
   return nets({
     method: 'POST',
     json: message,
@@ -116,4 +116,4 @@ function broadcast(url, channel, message, cb) {
   })
 }
 
-var noop = function () {}
+function noop () {}

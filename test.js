@@ -13,7 +13,6 @@ server.listen(9000, function () {
     }).on('open', function () {
       c.broadcast('hello', {hello: 'world'})
     })
-
   })
 
   tape('subscribe with trailing /', function (t) {
@@ -26,7 +25,6 @@ server.listen(9000, function () {
     }).on('open', function () {
       c.broadcast('hello', {hello: 'world'})
     })
-
   })
 
   tape('subscribe to many', function (t) {
@@ -42,15 +40,14 @@ server.listen(9000, function () {
         })
       }
     }).on('open', function () {
-      c.broadcast('hello', { msg: 'stranger'}, function () {
-        c.broadcast('goodbye', { msg: 'friend'})
+      c.broadcast('hello', {msg: 'stranger'}, function () {
+        c.broadcast('goodbye', {msg: 'friend'})
       })
     })
   })
 
   tape('close multiple', function (t) {
     var c = client('app', ['localhost:9000'])
-    var msgs = ['stranger', 'friend']
 
     c.subscribe(['hello', 'goodbye'])
     c.subscribe(['hi', 'bye'])
