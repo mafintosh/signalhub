@@ -12,7 +12,8 @@ function SignalHub (app, urls) {
 
   events.EventEmitter.call(this)
   this.setMaxListeners(0)
-  
+  this.closed = false
+
   if (!app) throw new Error('app name required')
   if (!urls || !urls.length) throw new Error('signalhub url(s) required')
 
@@ -29,7 +30,7 @@ function SignalHub (app, urls) {
 inherits(SignalHub, events.EventEmitter)
 
 SignalHub.prototype.subscribe = function (channel) {
-  if (this.closed) return
+  if (this.closed) throw new Error('Cannot subscribe after close')
 
   var endpoint = Array.isArray(channel) ? channel.join(',') : channel
   var streams = this.urls.map(function (url) {
@@ -62,6 +63,7 @@ SignalHub.prototype.subscribe = function (channel) {
 }
 
 SignalHub.prototype.broadcast = function (channel, message, cb) {
+  if (this.closed) throw new Error('Cannot broadcast after close')
   if (!cb) cb = noop
 
   var pending = this.urls.length
