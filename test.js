@@ -15,6 +15,36 @@ server.listen(9000, function () {
     })
   })
 
+  tape('subscribe two apps', function (t) {
+    t.plan(2)
+
+    var missing = 2
+    var c1 = client('app1', ['localhost:9000'])
+
+    c1.subscribe('hello').on('data', function (message) {
+      t.same(message, {hello: 'world'})
+      done()
+    }).on('open', function () {
+      c1.broadcast('hello', {hello: 'world'})
+    })
+
+    var c2 = client('app2', ['localhost:9000'])
+
+    c2.subscribe('hello').on('data', function (message) {
+      t.same(message, {hello: 'world'})
+      done()
+    }).on('open', function () {
+      c2.broadcast('hello', {hello: 'world'})
+    })
+
+    function done () {
+      if (--missing) return
+      c1.close()
+      c2.close()
+      t.end()
+    }
+  })
+
   tape('subscribe with trailing /', function (t) {
     var c = client('app', ['localhost:9000/'])
 
