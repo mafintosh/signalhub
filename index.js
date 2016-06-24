@@ -52,7 +52,6 @@ SignalHub.prototype.subscribe = function (channel) {
 
   this.subscribers.push(subscriber)
 
-  var self = this
   subscriber.once('close', function () {
     var i = self.subscribers.indexOf(subscriber)
     if (i > -1) self.subscribers.splice(i, 1)
