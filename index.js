@@ -106,7 +106,7 @@ function broadcast (app, url, channel, message, cb) {
   return nets({
     method: 'POST',
     json: message,
-    url: url + '/v1/' + this.app + '/' + channel
+    url: url + '/v1/' + app + '/' + channel
   }, function (err, res) {
     if (err) return cb(err)
     if (res.statusCode !== 200) return cb(new Error('Bad status: ' + res.statusCode))
