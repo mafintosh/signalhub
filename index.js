@@ -9,22 +9,20 @@ module.exports = SignalHub
 
 function SignalHub (app, urls) {
   if (!(this instanceof SignalHub)) return new SignalHub(app, urls)
-
-  events.EventEmitter.call(this)
-  this.setMaxListeners(0)
-  this.closed = false
-
   if (!app) throw new Error('app name required')
   if (!urls || !urls.length) throw new Error('signalhub url(s) required')
 
-  if (!Array.isArray(urls)) urls = [urls]
+  events.EventEmitter.call(this)
+  this.setMaxListeners(0)
 
   this.app = app
+  if (!Array.isArray(urls)) urls = [urls]
   this.urls = urls.map(function (url) {
     url = url.replace(/\/$/, '')
     return url.indexOf('://') === -1 ? 'http://' + url : url
   })
   this.subscribers = []
+  this.closed = false
 }
 
 inherits(SignalHub, events.EventEmitter)
@@ -71,7 +69,7 @@ SignalHub.prototype.broadcast = function (channel, message, cb) {
 
   var self = this
   this.urls.forEach(function (url) {
-    broadcast(url, channel, message, function (err) {
+    broadcast(self.app, url, channel, message, function (err) {
       if (err) errors++
       if (--pending) return
       if (errors === self.urls.length) return cb(err)
@@ -104,7 +102,7 @@ SignalHub.prototype.close = function (cb) {
   }
 }
 
-function broadcast (url, channel, message, cb) {
+function broadcast (app, url, channel, message, cb) {
   return nets({
     method: 'POST',
     json: message,
