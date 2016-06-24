@@ -30,9 +30,10 @@ inherits(SignalHub, events.EventEmitter)
 SignalHub.prototype.subscribe = function (channel) {
   if (this.closed) throw new Error('Cannot subscribe after close')
 
+  var self = this
   var endpoint = Array.isArray(channel) ? channel.join(',') : channel
   var streams = this.urls.map(function (url) {
-    return ess(url + '/v1/' + this.app + '/' + endpoint, {json: true})
+    return ess(url + '/v1/' + self.app + '/' + endpoint, {json: true})
   })
 
   var subscriber
