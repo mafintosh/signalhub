@@ -39,9 +39,11 @@ server.listen(9000, function () {
 
     function done () {
       if (--missing) return
-      c1.close()
-      c2.close()
-      t.end()
+      setTimeout(function () {
+        c1.close()
+        c2.close()
+        t.end()
+      }, 100)
     }
   })
 
