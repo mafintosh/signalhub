@@ -62,6 +62,7 @@ SignalHub.prototype.subscribe = function (channel) {
 
 SignalHub.prototype.broadcast = function (channel, message, cb) {
   if (this.closed) throw new Error('Cannot broadcast after close')
+  if (!message) message = {}
   if (!cb) cb = noop
 
   var pending = this.urls.length
