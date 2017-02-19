@@ -21,6 +21,7 @@
     "tape": "^4.0.0"
   },
   "scripts": {
+    "start": "node ./bin.js listen",
     "test": "standard && tape test.js"
   },
   "bin": {
