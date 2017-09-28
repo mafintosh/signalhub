@@ -85,7 +85,17 @@ signalhub subscribe my-app my-channel -p 8080 -h yourhub.com
 
 This also works in the browser using browserify :)
 
-## Heroku
+## Deploying with popular services
+
+No additional configuration is needed.
+
+### now.sh
+
+```
+now mafintosh/signalhub
+```
+
+### Heroku
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## License

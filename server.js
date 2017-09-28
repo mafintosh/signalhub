@@ -75,6 +75,9 @@ module.exports = function (opts) {
 
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
+      res.setHeader('Cache-Control', 'no-cache')
+      // Disable NGINX request buffering
+      res.setHeader('X-Accel-Buffering', 'no')
 
       var app = name.split('/')[0]
       var channelNames = name.slice(app.length + 1)
