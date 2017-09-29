@@ -17,8 +17,8 @@
     "through2": "^0.6.5"
   },
   "devDependencies": {
-    "standard": "^7.1.2",
-    "tape": "^4.0.0"
+    "standard": "^10.0.3",
+    "tape": "^4.8.0"
   },
   "scripts": {
     "start": "node ./bin.js listen",
