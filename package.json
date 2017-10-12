@@ -14,7 +14,7 @@
     "random-iterate": "^1.0.1",
     "size-limit-stream": "^1.0.0",
     "stream-collector": "^1.0.1",
-    "through2": "^0.6.5"
+    "through2": "^2.0.0"
   },
   "devDependencies": {
     "standard": "^10.0.3",
