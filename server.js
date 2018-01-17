@@ -36,8 +36,8 @@ module.exports = function (opts) {
   })
 
   var onRequest = cors(function (req, res) {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
     if (req.url === '/') {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8')
       flushHeaders(res)
       res.end(JSON.stringify({name: 'signalhub', version: require('./package').version, subscribers: subs}, null, 2) + '\n')
       return
