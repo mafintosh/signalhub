@@ -43,13 +43,15 @@ module.exports = function (opts) {
       return
     }
 
-    if (req.url.indexOf('/v1/') == -1) {
+    var versionIndex = req.url.indexOf('/v1/')
+
+    if (-1 === versionIndex) {
       res.statusCode = 404
       res.end()
       return
     }
 
-    var name = req.url.slice(req.url.indexOf('/v1/')).split('?')[0]
+    var name = req.url.slice(versionIndex).split('?')[0]
 
     if (req.method === 'POST') {
       collect(pump(req, limiter(64 * 1024)), function (err, data) {
